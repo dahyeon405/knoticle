@@ -1,7 +1,7 @@
+import { FixedSizeList as List } from 'react-window';
+
 import ArticleItem from '@components/search/ArticleItem';
 import { IArticleBook } from '@interfaces';
-import { getTextAfterLastNewLine, highlightKeyword } from '@utils/highlight-keyword';
-import { markdown2text } from '@utils/parser';
 
 interface ArticleListProps {
   articles: IArticleBook[];
@@ -10,21 +10,14 @@ interface ArticleListProps {
 
 export default function ArticleList({ articles, keywords }: ArticleListProps) {
   return (
-    <>
-      {articles.map((article) => (
-        <ArticleItem
-          key={article.id}
-          title={highlightKeyword(article.title, keywords)}
-          content={highlightKeyword(
-            getTextAfterLastNewLine(markdown2text(article.content), keywords),
-            keywords
-          )}
-          nickname={article.book.user.nickname}
-          profileImage={article.book.user.profile_image}
-          articleUrl={`/viewer/${article.book.id}/${article.id}`}
-          studyUrl={`/study/${article.book.user.nickname}`}
-        />
-      ))}
-    </>
+    <List
+      height={window.innerHeight - 215}
+      width="100%"
+      itemSize={110.95}
+      itemData={{ articles, keywords }}
+      itemCount={articles.length}
+    >
+      {ArticleItem}
+    </List>
   );
 }

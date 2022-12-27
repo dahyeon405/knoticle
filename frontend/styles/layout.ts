@@ -74,8 +74,8 @@ export const PageGNBHide = styled.div<{ isscrolldown: 'true' | 'false' }>`
 `;
 
 export const PageWrapperWithHeight = styled.div<{ initialHeight: number }>`
-  padding-top: 64px;
+  padding-top: 32px;
   background-color: var(--light-yellow-color);
   min-height: ${(props) =>
-    props.initialHeight !== 0 ? `${props.initialHeight + 600}px` : 'calc(100vh - 131px)'};
+    props.initialHeight !== 0 ? `${props.initialHeight + 600}px` : 'calc(100vh - 99px)'};
 `;
