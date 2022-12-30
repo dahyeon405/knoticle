@@ -11,7 +11,6 @@ import SearchHead from '@components/search/SearchHead';
 import SearchNoResult from '@components/search/SearchNoResult';
 import useDebounce from '@hooks/useDebounce';
 import useFetch from '@hooks/useFetch';
-import useIntersectionObserver from '@hooks/useIntersectionObserver';
 import useSessionStorage from '@hooks/useSessionStorage';
 import { PageInnerSmall, PageWrapperWithHeight } from '@styles/layout';
 
@@ -41,8 +40,8 @@ export default function Search() {
   const debouncedKeyword = useDebounce(keyword, 300);
   const [keywords, setKeywords] = useState<string[]>([]);
 
-  const target = useRef() as RefObject<HTMLDivElement>;
-  const isIntersecting = useIntersectionObserver(target);
+  // const target = useRef() as RefObject<HTMLDivElement>;
+  // const isIntersecting = useIntersectionObserver(target);
 
   const [isInitialRendering, setIsInitialRendering] = useState(true);
 
@@ -102,36 +101,6 @@ export default function Search() {
       pageNumber: 2,
     });
   }, [debouncedKeyword, filter.isUsers]);
-
-  useEffect(() => {
-    if (!isIntersecting || !debouncedKeyword) return;
-
-    if (filter.type === 'article' && !isArticleNoResult) {
-      if (!articlePage.hasNextPage) return;
-      searchArticles({
-        query: debouncedKeyword,
-        isUsers: filter.isUsers,
-        page: articlePage.pageNumber,
-        take: 12,
-      });
-      setArticlePage({
-        ...articlePage,
-        pageNumber: articlePage.pageNumber + 1,
-      });
-    } else if (filter.type === 'book' && !isBookNoResult) {
-      if (!bookPage.hasNextPage) return;
-      searchBooks({
-        query: debouncedKeyword,
-        isUsers: filter.isUsers,
-        page: bookPage.pageNumber,
-        take: 12,
-      });
-      setBookPage({
-        ...bookPage,
-        pageNumber: bookPage.pageNumber + 1,
-      });
-    }
-  }, [isIntersecting]);
 
   useEffect(() => {
     if (!newArticles) return;
@@ -206,6 +175,36 @@ export default function Search() {
     if (e.target) setKeyword(e.target.value);
   };
 
+  const loadMoreItems = async () => {
+    if (!debouncedKeyword) return;
+
+    if (filter.type === 'article' && !isArticleNoResult) {
+      if (!articlePage.hasNextPage) return;
+      searchArticles({
+        query: debouncedKeyword,
+        isUsers: filter.isUsers,
+        page: articlePage.pageNumber,
+        take: 12,
+      });
+      setArticlePage({
+        ...articlePage,
+        pageNumber: articlePage.pageNumber + 1,
+      });
+    } else if (filter.type === 'book' && !isBookNoResult) {
+      if (!bookPage.hasNextPage) return;
+      searchBooks({
+        query: debouncedKeyword,
+        isUsers: filter.isUsers,
+        page: bookPage.pageNumber,
+        take: 12,
+      });
+      setBookPage({
+        ...bookPage,
+        pageNumber: bookPage.pageNumber + 1,
+      });
+    }
+  };
+
   useEffect(() => {
     setInitialHeight(Number(sessionStorage.getItem('scroll')));
   }, []);
@@ -227,12 +226,25 @@ export default function Search() {
             (isArticleNoResult ? (
               <SearchNoResult />
             ) : (
-              <ArticleList articles={articles} keywords={keywords} />
+              <ArticleList
+                isItemLoaded={() => !articlePage.hasNextPage}
+                loadMoreItems={loadMoreItems}
+                articles={articles}
+                keywords={keywords}
+              />
             ))}
           {debouncedKeyword !== '' &&
             filter.type === 'book' &&
-            (isBookNoResult ? <SearchNoResult /> : <BookList books={books} keywords={keywords} />)}
-          <div ref={target} />
+            (isBookNoResult ? (
+              <SearchNoResult />
+            ) : (
+              <BookList
+                isItemLoaded={() => !bookPage.hasNextPage}
+                loadMoreItems={loadMoreItems}
+                books={books}
+                keywords={keywords}
+              />
+            ))}
         </PageInnerSmall>
       </PageWrapperWithHeight>
     </>
