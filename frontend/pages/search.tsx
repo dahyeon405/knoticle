@@ -12,7 +12,7 @@ import SearchNoResult from '@components/search/SearchNoResult';
 import useDebounce from '@hooks/useDebounce';
 import useFetch from '@hooks/useFetch';
 import useSessionStorage from '@hooks/useSessionStorage';
-import { PageInnerSmall, PageWrapperWithHeight } from '@styles/layout';
+import { PageInnerSmall, PageWrapperPaddingSmall } from '@styles/layout';
 
 export default function Search() {
   const { value: articles, setValue: setArticles } = useSessionStorage('articles', []);
@@ -52,9 +52,6 @@ export default function Search() {
 
   const [isArticleNoResult, setIsArticleNoResult] = useState(false);
   const [isBookNoResult, setIsBookNoResult] = useState(false);
-
-  const { setValue: setScrollTop } = useSessionStorage('scroll', 0);
-  const [initialHeight, setInitialHeight] = useState(0);
 
   useEffect(() => {
     setKeywords(
@@ -147,32 +144,13 @@ export default function Search() {
     });
   }, [newBooks]);
 
-  useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrollTop(window.scrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
   const handleFilter = (value: { [value: string]: string | boolean }) => {
     setIsInitialRendering(false);
     setFilter({
       ...filter,
       ...value,
     });
-    if (initialHeight !== 0) setInitialHeight(0);
+    // if (initialHeight !== 0) setInitialHeight(0);
   };
 
   const handleKeywordOnChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -210,23 +188,13 @@ export default function Search() {
     }
   };
 
-  useEffect(() => {
-    setInitialHeight(Number(sessionStorage.getItem('scroll')));
-  }, []);
-
-  useEffect(() => {
-    if (initialHeight !== 0) window.scrollTo(0, initialHeight);
-  }, [initialHeight]);
-
   const syncHeight = () => {
     document.documentElement.style.setProperty('--window-inner-height', `${window.innerHeight}px`);
   };
 
   useEffect(() => {
     syncHeight();
-
     window.addEventListener('resize', syncHeight);
-
     return () => window.removeEventListener('resize', syncHeight);
   }, []);
 
@@ -234,7 +202,7 @@ export default function Search() {
     <>
       <SearchHead />
       <GNB />
-      <PageWrapperWithHeight initialHeight={initialHeight}>
+      <PageWrapperPaddingSmall>
         <PageInnerSmall>
           <SearchBar onChange={handleKeywordOnChange} value={keyword} />
           <SearchFilter filter={filter} handleFilter={handleFilter} />
@@ -248,6 +216,7 @@ export default function Search() {
                 loadMoreItems={loadMoreItems}
                 articles={articles}
                 keywords={keywords}
+                isInitialRendering={isInitialRendering}
               />
             ))}
           {debouncedKeyword !== '' &&
@@ -260,10 +229,11 @@ export default function Search() {
                 loadMoreItems={loadMoreItems}
                 books={books}
                 keywords={keywords}
+                isInitialRendering={isInitialRendering}
               />
             ))}
         </PageInnerSmall>
-      </PageWrapperWithHeight>
+      </PageWrapperPaddingSmall>
     </>
   );
 }

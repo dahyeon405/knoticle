@@ -1,7 +1,9 @@
+import { RefObject, useEffect, useRef } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeGrid as Grid } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 
+import useScrollSaver from '@hooks/useScrollSaver';
 import { IBookScraps } from '@interfaces';
 
 import BookItem from '../BookItem';
@@ -12,9 +14,28 @@ interface BookListProps {
   keywords: string[];
   isItemLoaded: () => boolean;
   loadMoreItems: () => Promise<void>;
+  isInitialRendering: boolean;
 }
 
-export default function BookList({ books, keywords, isItemLoaded, loadMoreItems }: BookListProps) {
+export default function BookList({
+  books,
+  keywords,
+  isItemLoaded,
+  loadMoreItems,
+  isInitialRendering,
+}: BookListProps) {
+  const target = useRef() as RefObject<HTMLDivElement>;
+  const { scroll, setScroll } = useScrollSaver(target, 'BookScroll');
+
+  useEffect(() => {
+    if (!target.current) return;
+    if (isInitialRendering) target.current.scrollTo(0, scroll);
+    else {
+      setScroll(0);
+      if (target.current) target.current.scrollTo(0, 0);
+    }
+  }, [keywords, target.current]);
+
   return (
     <BookListWrapper>
       <AutoSizer>
@@ -52,6 +73,7 @@ export default function BookList({ books, keywords, isItemLoaded, loadMoreItems 
                   itemData={{ books, keywords }}
                   ref={ref}
                   onItemsRendered={newItemsRendered}
+                  outerRef={target}
                 >
                   {BookItem}
                 </Grid>

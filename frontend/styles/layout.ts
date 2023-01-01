@@ -79,3 +79,9 @@ export const PageWrapperWithHeight = styled.div<{ initialHeight: number }>`
   min-height: ${(props) =>
     props.initialHeight !== 0 ? `${props.initialHeight + 600}px` : 'calc(100vh - 99px)'};
 `;
+
+export const PageWrapperPaddingSmall = styled.div`
+  padding-top: 32px;
+  min-height: calc(100vh - 99px);
+  background-color: var(--light-yellow-color);
+`;
