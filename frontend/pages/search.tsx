@@ -150,7 +150,6 @@ export default function Search() {
       ...filter,
       ...value,
     });
-    // if (initialHeight !== 0) setInitialHeight(0);
   };
 
   const handleKeywordOnChange = (e: ChangeEvent<HTMLInputElement>) => {
