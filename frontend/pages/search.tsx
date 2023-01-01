@@ -1,4 +1,4 @@
-import { ChangeEvent, RefObject, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 
 import { searchArticlesApi } from '@apis/articleApi';
 import { searchBooksApi } from '@apis/bookApi';
@@ -39,9 +39,6 @@ export default function Search() {
 
   const debouncedKeyword = useDebounce(keyword, 300);
   const [keywords, setKeywords] = useState<string[]>([]);
-
-  // const target = useRef() as RefObject<HTMLDivElement>;
-  // const isIntersecting = useIntersectionObserver(target);
 
   const [isInitialRendering, setIsInitialRendering] = useState(true);
 
@@ -212,6 +209,18 @@ export default function Search() {
   useEffect(() => {
     if (initialHeight !== 0) window.scrollTo(0, initialHeight);
   }, [initialHeight]);
+
+  const syncHeight = () => {
+    document.documentElement.style.setProperty('--window-inner-height', `${window.innerHeight}px`);
+  };
+
+  useEffect(() => {
+    syncHeight();
+
+    window.addEventListener('resize', syncHeight);
+
+    return () => window.removeEventListener('resize', syncHeight);
+  }, []);
 
   return (
     <>
