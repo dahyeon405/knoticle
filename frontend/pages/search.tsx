@@ -1,4 +1,4 @@
-import { ChangeEvent, RefObject, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 
 import { searchArticlesApi } from '@apis/articleApi';
 import { searchBooksApi } from '@apis/bookApi';
@@ -11,16 +11,23 @@ import SearchHead from '@components/search/SearchHead';
 import SearchNoResult from '@components/search/SearchNoResult';
 import useDebounce from '@hooks/useDebounce';
 import useFetch from '@hooks/useFetch';
-import useIntersectionObserver from '@hooks/useIntersectionObserver';
 import useSessionStorage from '@hooks/useSessionStorage';
-import { PageInnerSmall, PageWrapperWithHeight } from '@styles/layout';
+import { PageInnerSmall, PageWrapperPaddingSmall } from '@styles/layout';
 
 export default function Search() {
   const { value: articles, setValue: setArticles } = useSessionStorage('articles', []);
   const { value: books, setValue: setBooks } = useSessionStorage('books', []);
 
-  const { data: newArticles, execute: searchArticles } = useFetch(searchArticlesApi);
-  const { data: newBooks, execute: searchBooks } = useFetch(searchBooksApi);
+  const {
+    data: newArticles,
+    isLoading: isArticleLoading,
+    execute: searchArticles,
+  } = useFetch(searchArticlesApi);
+  const {
+    data: newBooks,
+    isLoading: isBookLoading,
+    execute: searchBooks,
+  } = useFetch(searchBooksApi);
 
   const { value: articlePage, setValue: setArticlePage } = useSessionStorage('articlePage', {
     hasNextPage: true,
@@ -41,16 +48,10 @@ export default function Search() {
   const debouncedKeyword = useDebounce(keyword, 300);
   const [keywords, setKeywords] = useState<string[]>([]);
 
-  const target = useRef() as RefObject<HTMLDivElement>;
-  const isIntersecting = useIntersectionObserver(target);
-
   const [isInitialRendering, setIsInitialRendering] = useState(true);
 
   const [isArticleNoResult, setIsArticleNoResult] = useState(false);
   const [isBookNoResult, setIsBookNoResult] = useState(false);
-
-  const { setValue: setScrollTop } = useSessionStorage('scroll', 0);
-  const [initialHeight, setInitialHeight] = useState(0);
 
   useEffect(() => {
     setKeywords(
@@ -104,36 +105,6 @@ export default function Search() {
   }, [debouncedKeyword, filter.isUsers]);
 
   useEffect(() => {
-    if (!isIntersecting || !debouncedKeyword) return;
-
-    if (filter.type === 'article' && !isArticleNoResult) {
-      if (!articlePage.hasNextPage) return;
-      searchArticles({
-        query: debouncedKeyword,
-        isUsers: filter.isUsers,
-        page: articlePage.pageNumber,
-        take: 12,
-      });
-      setArticlePage({
-        ...articlePage,
-        pageNumber: articlePage.pageNumber + 1,
-      });
-    } else if (filter.type === 'book' && !isBookNoResult) {
-      if (!bookPage.hasNextPage) return;
-      searchBooks({
-        query: debouncedKeyword,
-        isUsers: filter.isUsers,
-        page: bookPage.pageNumber,
-        take: 12,
-      });
-      setBookPage({
-        ...bookPage,
-        pageNumber: bookPage.pageNumber + 1,
-      });
-    }
-  }, [isIntersecting]);
-
-  useEffect(() => {
     if (!newArticles) return;
 
     if (newArticles.data.length === 0 && articlePage.pageNumber === 2) {
@@ -173,32 +144,12 @@ export default function Search() {
     });
   }, [newBooks]);
 
-  useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrollTop(window.scrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
   const handleFilter = (value: { [value: string]: string | boolean }) => {
     setIsInitialRendering(false);
     setFilter({
       ...filter,
       ...value,
     });
-    if (initialHeight !== 0) setInitialHeight(0);
   };
 
   const handleKeywordOnChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -206,19 +157,51 @@ export default function Search() {
     if (e.target) setKeyword(e.target.value);
   };
 
-  useEffect(() => {
-    setInitialHeight(Number(sessionStorage.getItem('scroll')));
-  }, []);
+  const loadMoreItems = async () => {
+    if (!debouncedKeyword) return;
+
+    if (filter.type === 'article' && !isArticleNoResult) {
+      if (!articlePage.hasNextPage) return;
+      searchArticles({
+        query: debouncedKeyword,
+        isUsers: filter.isUsers,
+        page: articlePage.pageNumber,
+        take: 12,
+      });
+      setArticlePage({
+        ...articlePage,
+        pageNumber: articlePage.pageNumber + 1,
+      });
+    } else if (filter.type === 'book' && !isBookNoResult) {
+      if (!bookPage.hasNextPage) return;
+      searchBooks({
+        query: debouncedKeyword,
+        isUsers: filter.isUsers,
+        page: bookPage.pageNumber,
+        take: 12,
+      });
+      setBookPage({
+        ...bookPage,
+        pageNumber: bookPage.pageNumber + 1,
+      });
+    }
+  };
+
+  const syncHeight = () => {
+    document.documentElement.style.setProperty('--window-inner-height', `${window.innerHeight}px`);
+  };
 
   useEffect(() => {
-    if (initialHeight !== 0) window.scrollTo(0, initialHeight);
-  }, [initialHeight]);
+    syncHeight();
+    window.addEventListener('resize', syncHeight);
+    return () => window.removeEventListener('resize', syncHeight);
+  }, []);
 
   return (
     <>
       <SearchHead />
       <GNB />
-      <PageWrapperWithHeight initialHeight={initialHeight}>
+      <PageWrapperPaddingSmall>
         <PageInnerSmall>
           <SearchBar onChange={handleKeywordOnChange} value={keyword} />
           <SearchFilter filter={filter} handleFilter={handleFilter} />
@@ -227,14 +210,29 @@ export default function Search() {
             (isArticleNoResult ? (
               <SearchNoResult />
             ) : (
-              <ArticleList articles={articles} keywords={keywords} />
+              <ArticleList
+                isItemLoaded={() => !isArticleLoading && !articlePage.hasNextPage}
+                loadMoreItems={loadMoreItems}
+                articles={articles}
+                keywords={keywords}
+                isInitialRendering={isInitialRendering}
+              />
             ))}
           {debouncedKeyword !== '' &&
             filter.type === 'book' &&
-            (isBookNoResult ? <SearchNoResult /> : <BookList books={books} keywords={keywords} />)}
-          <div ref={target} />
+            (isBookNoResult ? (
+              <SearchNoResult />
+            ) : (
+              <BookList
+                isItemLoaded={() => !isBookLoading && !bookPage.hasNextPage}
+                loadMoreItems={loadMoreItems}
+                books={books}
+                keywords={keywords}
+                isInitialRendering={isInitialRendering}
+              />
+            ))}
         </PageInnerSmall>
-      </PageWrapperWithHeight>
+      </PageWrapperPaddingSmall>
     </>
   );
 }

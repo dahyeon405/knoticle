@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const BookListWrapper = styled.div`
+const ArticleListWrapper = styled.div`
   width: 100%;
   height: calc(var(--window-inner-height) - 214px);
 
@@ -15,4 +15,4 @@ const BookListWrapper = styled.div`
   }
 `;
 
-export default BookListWrapper;
+export default ArticleListWrapper;
