@@ -4,8 +4,14 @@ const BookListWrapper = styled.div`
   width: 100%;
   height: calc(var(--window-inner-height) - 214px);
 
-  & div {
-    justify-self: center;
+  div {
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--grey-02-color);
+      border-radius: 10px;
+    }
   }
 `;
 
