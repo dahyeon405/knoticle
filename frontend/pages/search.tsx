@@ -18,8 +18,16 @@ export default function Search() {
   const { value: articles, setValue: setArticles } = useSessionStorage('articles', []);
   const { value: books, setValue: setBooks } = useSessionStorage('books', []);
 
-  const { data: newArticles, execute: searchArticles } = useFetch(searchArticlesApi);
-  const { data: newBooks, execute: searchBooks } = useFetch(searchBooksApi);
+  const {
+    data: newArticles,
+    isLoading: isArticleLoading,
+    execute: searchArticles,
+  } = useFetch(searchArticlesApi);
+  const {
+    data: newBooks,
+    isLoading: isBookLoading,
+    execute: searchBooks,
+  } = useFetch(searchBooksApi);
 
   const { value: articlePage, setValue: setArticlePage } = useSessionStorage('articlePage', {
     hasNextPage: true,
@@ -236,7 +244,7 @@ export default function Search() {
               <SearchNoResult />
             ) : (
               <ArticleList
-                isItemLoaded={() => !articlePage.hasNextPage}
+                isItemLoaded={() => !isArticleLoading && !articlePage.hasNextPage}
                 loadMoreItems={loadMoreItems}
                 articles={articles}
                 keywords={keywords}
@@ -248,7 +256,7 @@ export default function Search() {
               <SearchNoResult />
             ) : (
               <BookList
-                isItemLoaded={() => !bookPage.hasNextPage}
+                isItemLoaded={() => !isBookLoading && !bookPage.hasNextPage}
                 loadMoreItems={loadMoreItems}
                 books={books}
                 keywords={keywords}
