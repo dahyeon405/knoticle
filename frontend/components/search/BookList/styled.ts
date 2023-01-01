@@ -1,10 +1,6 @@
 import styled from 'styled-components';
 
-export const BookContainer = styled.div`
-  width: 280px;
-`;
-
-export const BookListWrapper = styled.div`
+const BookListWrapper = styled.div`
   width: 100%;
 
   display: grid;
@@ -31,3 +27,5 @@ export const BookListWrapper = styled.div`
     grid-template-columns: repeat(1, 1fr);
   }
 `;
+
+export default BookListWrapper;
