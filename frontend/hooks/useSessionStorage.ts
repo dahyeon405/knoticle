@@ -5,12 +5,10 @@ const useSessionStorage = <T>(key: string, initialValue: T) => {
   const [isValueSet, setIsValueSet] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedValue = sessionStorage.getItem(key);
-      if (savedValue) setStateValue(JSON.parse(savedValue));
-      setIsValueSet(true);
-    }
-  }, [typeof window]);
+    const savedValue = sessionStorage.getItem(key);
+    if (savedValue) setStateValue(JSON.parse(savedValue));
+    setIsValueSet(true);
+  }, []);
 
   const setValue = (newValue: T) => {
     setStateValue(newValue);
