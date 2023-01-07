@@ -33,7 +33,7 @@ const useScrollDetector = (element: RefObject<HTMLDivElement>, threshold: number
     return () => {
       if (element.current) element.current.removeEventListener('scroll', onScroll);
     };
-  }, [element]);
+  }, [element.current]);
 
   return isScrollDown;
 };

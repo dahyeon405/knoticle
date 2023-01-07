@@ -8,13 +8,19 @@ export const SearchBarWrapper = styled.div`
   align-items: center;
 `;
 
-export const SearchBarInput = styled.input`
+export const SearchBarInput = styled.input<{ shrinked: boolean }>`
   flex: 1;
   background-color: var(--light-yellow-color);
   padding: 8px;
   border: none;
   outline: none;
-  font-size: 32px;
   font-family: Noto Sans KR;
   width: 100%;
+
+  font-size: ${(props) => (props.shrinked ? '24px' : '32px')};
+  text-align: ${(props) => (props.shrinked ? 'center' : 'left')};
+`;
+
+export const SearchIconBox = styled.div<{ visibility: boolean }>`
+  visibility: ${(props) => (props.visibility ? 'visible' : 'hidden')};
 `;
