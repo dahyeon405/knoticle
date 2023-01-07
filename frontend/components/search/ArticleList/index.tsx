@@ -1,9 +1,10 @@
-import { RefObject, useEffect, useRef } from 'react';
+import { Dispatch, RefObject, SetStateAction, useEffect, useRef } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 
 import ArticleItem from '@components/search/ArticleItem';
+import useScrollDetector from '@hooks/useScrollDetector';
 import useScrollSaver from '@hooks/useScrollSaver';
 import { IArticleBook } from '@interfaces';
 
@@ -15,6 +16,7 @@ interface ArticleListProps {
   isItemLoaded: () => boolean;
   loadMoreItems: () => Promise<void>;
   isInitialRendering: boolean;
+  setIsScrollDown: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function ArticleList({
@@ -23,9 +25,12 @@ export default function ArticleList({
   isInitialRendering,
   isItemLoaded,
   loadMoreItems,
+  setIsScrollDown,
 }: ArticleListProps) {
   const target = useRef() as RefObject<HTMLDivElement>;
   const { scroll, setScroll } = useScrollSaver(target, 'ArticleScroll');
+
+  const isScrollDown = useScrollDetector(target, 3);
 
   useEffect(() => {
     if (!target.current) return;
@@ -35,6 +40,10 @@ export default function ArticleList({
       if (target.current) target.current.scrollTo(0, 0);
     }
   }, [keywords, target.current]);
+
+  useEffect(() => {
+    setIsScrollDown(isScrollDown);
+  }, [isScrollDown]);
 
   return (
     <ArticleListWrapper>
@@ -47,7 +56,7 @@ export default function ArticleList({
           >
             {({ onItemsRendered, ref }) => (
               <List
-                height={height}
+                height={isScrollDown ? height + 52 : height}
                 width={width}
                 itemSize={110.95}
                 itemData={{ articles, keywords }}
@@ -56,6 +65,7 @@ export default function ArticleList({
                 onItemsRendered={onItemsRendered}
                 outerRef={target}
                 initialScrollOffset={scroll}
+                overscanCount={10}
               >
                 {ArticleItem}
               </List>
