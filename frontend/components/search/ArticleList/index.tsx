@@ -56,7 +56,7 @@ export default function ArticleList({
           >
             {({ onItemsRendered, ref }) => (
               <List
-                height={isScrollDown ? height + 52 : height}
+                height={height}
                 width={width}
                 itemSize={110.95}
                 itemData={{ articles, keywords }}
