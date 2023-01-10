@@ -4,10 +4,7 @@ import { Flex, FlexColumn, FlexSpaceBetween } from '@styles/layout';
 
 export const ArticleContainer = styled(FlexColumn)`
   flex: 1;
-  height: calc(var(--window-inner-height) - 67px);
-  @media ${(props) => props.theme.mobile} {
-    height: calc(var(--window-inner-height));
-  }
+  height: calc(var(--window-inner-height));
 `;
 export const ArticleLeftBtn = styled.div<{ visibility: string }>`
   position: fixed;
@@ -35,7 +32,7 @@ export const ArticleRightBtn = styled.div<{ visibility: string }>`
 export const ArticleMain = styled(Flex)`
   flex-direction: column;
   width: 100%;
-  padding: 36px 50px;
+  padding: 112px 50px;
   overflow-y: scroll;
   box-sizing: border-box;
 

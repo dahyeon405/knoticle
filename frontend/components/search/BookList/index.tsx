@@ -1,8 +1,9 @@
-import { RefObject, useEffect, useRef } from 'react';
+import { RefObject, SetStateAction, useEffect, useRef, Dispatch } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeGrid as Grid } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 
+import useScrollDetector from '@hooks/useScrollDetector';
 import useScrollSaver from '@hooks/useScrollSaver';
 import { IBookScraps } from '@interfaces';
 

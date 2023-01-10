@@ -64,13 +64,9 @@ export const PageNoScrollWrapper = styled.div`
   width: 100%;
 `;
 
-export const PageGNBHide = styled.div<{ isscrolldown: 'true' | 'false' }>`
-  @media ${(props) => props.theme.mobile} {
-    position: absolute;
-    top: ${(props) => (props.isscrolldown === 'true' ? '-67px' : '0px')};
-    transition: top 0.2s ease-in-out;
-    width: 100%;
-  }
+export const PageGNBHide = styled.div`
+  position: absolute;
+  width: 100%;
 `;
 
 export const PageWrapperWithHeight = styled.div<{ initialHeight: number }>`

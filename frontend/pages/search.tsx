@@ -8,11 +8,12 @@ import BookList from '@components/search/BookList';
 import SearchBar from '@components/search/SearchBar';
 import SearchFilter from '@components/search/SearchFilter';
 import SearchHead from '@components/search/SearchHead';
+import SearchInputs from '@components/search/SearchInputs';
 import SearchNoResult from '@components/search/SearchNoResult';
 import useDebounce from '@hooks/useDebounce';
 import useFetch from '@hooks/useFetch';
 import useSessionStorage from '@hooks/useSessionStorage';
-import { PageInnerSmall, PageWrapperPaddingSmall } from '@styles/layout';
+import { PageInnerSmall, PageWrapperPaddingSmall, PageNoScrollWrapper } from '@styles/layout';
 
 export default function Search() {
   const { value: articles, setValue: setArticles } = useSessionStorage('articles', []);
@@ -52,6 +53,8 @@ export default function Search() {
 
   const [isArticleNoResult, setIsArticleNoResult] = useState(false);
   const [isBookNoResult, setIsBookNoResult] = useState(false);
+
+  const [isScrollDown, setIsScrollDown] = useState(false);
 
   useEffect(() => {
     setKeywords(
@@ -198,13 +201,15 @@ export default function Search() {
   }, []);
 
   return (
-    <>
+    <PageNoScrollWrapper>
       <SearchHead />
       <GNB />
       <PageWrapperPaddingSmall>
         <PageInnerSmall>
-          <SearchBar onChange={handleKeywordOnChange} value={keyword} />
-          <SearchFilter filter={filter} handleFilter={handleFilter} />
+          <SearchInputs isScrollDown={isScrollDown}>
+            <SearchBar onChange={handleKeywordOnChange} value={keyword} />
+            <SearchFilter filter={filter} handleFilter={handleFilter} />
+          </SearchInputs>
           {debouncedKeyword !== '' &&
             filter.type === 'article' &&
             (isArticleNoResult ? (
@@ -216,6 +221,7 @@ export default function Search() {
                 articles={articles}
                 keywords={keywords}
                 isInitialRendering={isInitialRendering}
+                setIsScrollDown={setIsScrollDown}
               />
             ))}
           {debouncedKeyword !== '' &&
@@ -233,6 +239,6 @@ export default function Search() {
             ))}
         </PageInnerSmall>
       </PageWrapperPaddingSmall>
-    </>
+    </PageNoScrollWrapper>
   );
 }
