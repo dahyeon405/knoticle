@@ -12,7 +12,7 @@ interface TocWrapperProps {
 
 export const TocWrapper = styled(FlexColumnSpaceBetween)<TocWrapperProps>`
   flex-basis: ${(props) => (props.isOpen ? '300px' : '0')};
-  height: calc(var(--window-inner-height) - 67px);
+  height: calc(var(--window-inner-height));
   color: var(--white-color);
   background-color: var(--primary-color);
   transition: all 0.3s ease;
@@ -27,7 +27,6 @@ export const TocWrapper = styled(FlexColumnSpaceBetween)<TocWrapperProps>`
     position: absolute;
     z-index: 5;
     width: ${(props) => (props.isOpen ? '100%' : '0')};
-    height: calc(var(--window-inner-height));
   }
 `;
 
@@ -36,10 +35,8 @@ export const TocOpenButton = styled.button<{ isscrolldown: 'true' | 'false' }>`
   margin-top: 24px;
   z-index: 0;
 
-  @media ${(props) => props.theme.mobile} {
-    top: ${(props) => (props.isscrolldown === 'true' ? '-127px' : '60px')};
-    transition: top 0.2s ease-in-out;
-  }
+  top: ${(props) => (props.isscrolldown === 'true' ? '-127px' : '60px')};
+  transition: top 0.2s ease-in-out;
 `;
 
 export const TocSideBar = styled(FlexColumn)`
