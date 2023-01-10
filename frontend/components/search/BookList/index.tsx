@@ -3,6 +3,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeGrid as Grid } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 
+import useScrollDetector from '@hooks/useScrollDetector';
 import useScrollSaver from '@hooks/useScrollSaver';
 import { IBookScraps } from '@interfaces';
 
@@ -15,7 +16,6 @@ interface BookListProps {
   isItemLoaded: () => boolean;
   loadMoreItems: () => Promise<void>;
   isInitialRendering: boolean;
-  setIsScrollDown: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function BookList({
@@ -24,7 +24,6 @@ export default function BookList({
   isItemLoaded,
   loadMoreItems,
   isInitialRendering,
-  setIsScrollDown,
 }: BookListProps) {
   const target = useRef() as RefObject<HTMLDivElement>;
   const { scroll, setScroll } = useScrollSaver(target, 'BookScroll');

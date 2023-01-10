@@ -2,7 +2,8 @@ import styled from 'styled-components';
 
 const BookListWrapper = styled.div`
   width: 100%;
-  height: calc(var(--window-inner-height) - 214px);
+  height: calc(var(--window-inner-height) - 230px);
+  top: 130px;
 
   div {
     ::-webkit-scrollbar {
