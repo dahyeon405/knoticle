@@ -30,7 +30,7 @@ export default function ArticleList({
   const target = useRef() as RefObject<HTMLDivElement>;
   const { scroll, setScroll } = useScrollSaver(target, 'ArticleScroll');
 
-  const isScrollDown = useScrollDetector(target, 3);
+  const isScrollDown = useScrollDetector(target, 1);
 
   useEffect(() => {
     if (!target.current) return;

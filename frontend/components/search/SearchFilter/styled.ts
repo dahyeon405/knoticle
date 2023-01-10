@@ -4,7 +4,8 @@ export const FilterWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 16px 0px;
+  padding: 16px 10px;
+  box-sizing: border-box;
   background-color: var(--light-yellow-color);
 `;
 

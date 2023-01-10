@@ -6,6 +6,8 @@ export const SearchBarWrapper = styled.div`
   display: flex;
   align-items: center;
   background-color: var(--light-yellow-color);
+  padding: 0px 10px;
+  box-sizing: border-box;
 `;
 
 export const SearchBarInput = styled.input`
