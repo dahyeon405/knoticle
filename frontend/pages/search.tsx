@@ -8,6 +8,7 @@ import BookList from '@components/search/BookList';
 import SearchBar from '@components/search/SearchBar';
 import SearchFilter from '@components/search/SearchFilter';
 import SearchHead from '@components/search/SearchHead';
+import SearchInputs from '@components/search/SearchInputs';
 import SearchNoResult from '@components/search/SearchNoResult';
 import useDebounce from '@hooks/useDebounce';
 import useFetch from '@hooks/useFetch';
@@ -205,8 +206,10 @@ export default function Search() {
       <GNB />
       <PageWrapperPaddingSmall>
         <PageInnerSmall>
-          <SearchBar onChange={handleKeywordOnChange} value={keyword} isScrollDown={isScrollDown} />
-          {!isScrollDown && <SearchFilter filter={filter} handleFilter={handleFilter} />}
+          <SearchInputs isScrollDown={isScrollDown}>
+            <SearchBar onChange={handleKeywordOnChange} value={keyword} />
+            <SearchFilter filter={filter} handleFilter={handleFilter} />
+          </SearchInputs>
           {debouncedKeyword !== '' &&
             filter.type === 'article' &&
             (isArticleNoResult ? (
