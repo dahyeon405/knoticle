@@ -10,7 +10,7 @@ interface SearchInputsProps {
 export default function SearchInputs({ children, isScrollDown }: SearchInputsProps) {
   return (
     <SearchInputWrapper>
-      <ScrollAppearer height="130px" isScrollDown={isScrollDown}>
+      <ScrollAppearer height="115px" isScrollDown={isScrollDown}>
         {children}
       </ScrollAppearer>
     </SearchInputWrapper>
