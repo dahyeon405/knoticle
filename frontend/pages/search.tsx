@@ -235,7 +235,6 @@ export default function Search() {
                 books={books}
                 keywords={keywords}
                 isInitialRendering={isInitialRendering}
-                setIsScrollDown={setIsScrollDown}
               />
             ))}
         </PageInnerSmall>
