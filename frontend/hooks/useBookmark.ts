@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 
 import { postBookmarkApi, deleteBookmarkApi } from '@apis/bookmarkApi';
-import curKnottedBookListState from '@atoms/curKnottedBookList';
 import signInStatusState from '@atoms/signInStatus';
 import { IBookScraps } from '@interfaces';
 import { toastError } from '@utils/toast';
@@ -12,7 +11,6 @@ import useFetch from './useFetch';
 
 const useBookmark = (book: IBookScraps) => {
   const signInStatus = useRecoilValue(signInStatusState);
-  const [curKnottedBookList, setCurKnottedBookList] = useRecoilState(curKnottedBookListState);
 
   const { _count, bookmarks } = book;
   const [curBookmarkId, setCurBookmarkId] = useState<number | null>(
@@ -41,29 +39,6 @@ const useBookmark = (book: IBookScraps) => {
     if (!postedBookmark) return;
     setCurBookmarkId(postedBookmark.bookmarkId);
     setCurBookmarkCnt(curBookmarkCnt + 1);
-
-    const newBookmarkedBook = {
-      ...book,
-      bookmarks: [
-        {
-          id: postedBookmark.bookmarkId,
-          user_id: signInStatus.id,
-          book_id: book.id,
-        },
-      ],
-      _count: {
-        bookmarks: curBookmarkCnt + 1,
-      },
-    };
-
-    setCurKnottedBookList(
-      curKnottedBookList.map((tempbook) => {
-        if (tempbook.id === book.id) {
-          return newBookmarkedBook;
-        }
-        return tempbook;
-      })
-    );
   }, [postedBookmark]);
 
   // 북마크 해제 시
@@ -71,23 +46,6 @@ const useBookmark = (book: IBookScraps) => {
     if (!deletedBookmark) return;
     setCurBookmarkId(null);
     setCurBookmarkCnt(curBookmarkCnt - 1);
-
-    const newUnBookmarkedBook = {
-      ...book,
-      bookmarks: [],
-      _count: {
-        bookmarks: curBookmarkCnt - 1,
-      },
-    };
-
-    setCurKnottedBookList(
-      curKnottedBookList.map((tempbook) => {
-        if (tempbook.id === book.id) {
-          return newUnBookmarkedBook;
-        }
-        return tempbook;
-      })
-    );
   }, [deletedBookmark]);
 
   return { handleBookmarkClick, curBookmarkCnt, curBookmarkId };
