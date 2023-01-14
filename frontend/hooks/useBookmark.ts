@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { postBookmarkApi, deleteBookmarkApi } from '@apis/bookmarkApi';
-import curBookmarkedBookListState from '@atoms/curBookmarkedBookList';
 import curKnottedBookListState from '@atoms/curKnottedBookList';
 import signInStatusState from '@atoms/signInStatus';
 import { IBookScraps } from '@interfaces';
@@ -14,9 +13,6 @@ import useFetch from './useFetch';
 const useBookmark = (book: IBookScraps) => {
   const signInStatus = useRecoilValue(signInStatusState);
   const [curKnottedBookList, setCurKnottedBookList] = useRecoilState(curKnottedBookListState);
-  const [curBookmarkedBookList, setCurBookmarkedBookList] = useRecoilState(
-    curBookmarkedBookListState
-  );
 
   const { _count, bookmarks } = book;
   const [curBookmarkId, setCurBookmarkId] = useState<number | null>(
@@ -68,7 +64,6 @@ const useBookmark = (book: IBookScraps) => {
         return tempbook;
       })
     );
-    setCurBookmarkedBookList([...curBookmarkedBookList, newBookmarkedBook]);
   }, [postedBookmark]);
 
   // 북마크 해제 시
@@ -93,7 +88,6 @@ const useBookmark = (book: IBookScraps) => {
         return tempbook;
       })
     );
-    setCurBookmarkedBookList(curBookmarkedBookList.filter((tempbook) => tempbook.id !== book.id));
   }, [deletedBookmark]);
 
   return { handleBookmarkClick, curBookmarkCnt, curBookmarkId };
