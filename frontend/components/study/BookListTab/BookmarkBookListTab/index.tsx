@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { getUserBookmarkedBooksApi } from '@apis/bookApi';
 import Book from '@components/common/Book';
 import useFetch from '@hooks/useFetch';
+import { IBookScraps } from '@interfaces';
 
 import BookGrid from './styled';
 
@@ -24,7 +25,8 @@ export default function BookmarkBookListTab() {
 
   return (
     <BookGrid>
-      {!isLoading && bookmarkedBookList.map((book) => <Book key={book.id} book={book} />)}
+      {!isLoading &&
+        bookmarkedBookList.map((book: IBookScraps) => <Book key={book.id} book={book} />)}
     </BookGrid>
   );
 }
