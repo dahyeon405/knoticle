@@ -24,11 +24,9 @@ interface BookListTabProps {
 }
 
 export default function KnottedBookListTab({ isUserMatched }: BookListTabProps) {
-  const {
-    data: knottedBookList,
-    isLoading,
-    execute: getKnottedBookList,
-  } = useFetch(getUserKnottedBooksApi);
+  const { data: knottedBookList, execute: getKnottedBookList } = useFetch(getUserKnottedBooksApi);
+
+  const [curKnottedBookList, setCurKnottedBookList] = useRecoilState(curKnottedBookListState);
 
   const [editInfo, setEditInfo] = useRecoilState(editInfoState);
   const setScraps = useSetRecoilState(scrapState);
@@ -37,7 +35,7 @@ export default function KnottedBookListTab({ isUserMatched }: BookListTabProps) 
   const [curEditBook, setCurEditBook] = useState<IBookScraps | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  const [curKnottedBookList, setCurKnottedBookList] = useRecoilState(curKnottedBookListState);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
     if (!router.query.data) return;
@@ -48,8 +46,8 @@ export default function KnottedBookListTab({ isUserMatched }: BookListTabProps) 
 
   useEffect(() => {
     if (!knottedBookList) return;
-
     setCurKnottedBookList(knottedBookList);
+    if (isInitialLoading) setIsInitialLoading(false);
   }, [knottedBookList]);
 
   const handleEditBookModalOpen = (id: number) => {
@@ -92,9 +90,9 @@ export default function KnottedBookListTab({ isUserMatched }: BookListTabProps) 
   return (
     <>
       <BookGrid>
-        {!isLoading &&
+        {!isInitialLoading &&
           curKnottedBookList &&
-          curKnottedBookList.map((book) =>
+          curKnottedBookList.map((book: IBookScraps) =>
             isEditing ? (
               <EditBookWrapper key={book.id}>
                 <MinusButton
