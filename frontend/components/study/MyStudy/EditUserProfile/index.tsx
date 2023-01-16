@@ -26,13 +26,13 @@ import {
 interface EditUserProfileProps {
   curUserProfile: IUser;
   setCurUserProfile: (userProfile: IUser) => void;
-  handleEditFinishBtnClick: () => void;
+  updateUserProfile: any;
 }
 
 export default function EditUserProfile({
   curUserProfile,
   setCurUserProfile,
-  handleEditFinishBtnClick,
+  updateUserProfile,
 }: EditUserProfileProps) {
   const { data: imgFile, execute: createImage } = useFetch(createImageApi);
 
@@ -60,14 +60,6 @@ export default function EditUserProfile({
   };
 
   useEffect(() => {
-    setCurUserProfile({
-      ...curUserProfile,
-      nickname: nicknameValue,
-      description: descriptionValue,
-    });
-  }, [nicknameValue, descriptionValue]);
-
-  useEffect(() => {
     if (!imgFile) return;
 
     setCurUserProfile({
@@ -75,6 +67,17 @@ export default function EditUserProfile({
       profile_image: imgFile.imagePath,
     });
   }, [imgFile]);
+
+  const handleEditFinishBtnClick = () => {
+    if (!curUserProfile) return;
+    const newUserProfile = {
+      ...curUserProfile,
+      nickname: nicknameValue,
+      description: descriptionValue,
+    };
+    updateUserProfile(newUserProfile);
+    setCurUserProfile(newUserProfile);
+  };
 
   return (
     <UserProfileWrapper>
@@ -94,13 +97,10 @@ export default function EditUserProfile({
 
       <UserDetailGroup>
         <UsernameGroup>
-          <EditUsername defaultValue={curUserProfile.nickname} onChange={onNicknameChange} />
+          <EditUsername value={nicknameValue} onChange={onNicknameChange} />
           {nicknameValue === '' && <RedNotice>빈 공백은 닉네임으로 설정할 수 없습니다</RedNotice>}
         </UsernameGroup>
-        <EditUserDescription
-          defaultValue={curUserProfile.description}
-          onChange={onDescriptionChange}
-        />
+        <EditUserDescription value={descriptionValue} onChange={onDescriptionChange} />
 
         <ButtonGroup isVisible>
           <ProfileEditButton

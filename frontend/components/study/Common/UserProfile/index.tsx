@@ -25,12 +25,11 @@ import {
 
 interface UserProfileProps {
   curUserProfile: IUser;
-  handleEditBtnClick: () => void;
+  handleEditBtnClick?: () => void;
 }
 
 export default function UserProfile({ curUserProfile, handleEditBtnClick }: UserProfileProps) {
   const router = useRouter();
-
   const [signInStatus, setSignInStatus] = useRecoilState(signInStatusState);
   const { data: user, execute: signOut } = useFetch(signOutApi);
 
@@ -68,3 +67,7 @@ export default function UserProfile({ curUserProfile, handleEditBtnClick }: User
     </UserProfileWrapper>
   );
 }
+
+UserProfile.defaultProps = {
+  handleEditBtnClick: null,
+};
