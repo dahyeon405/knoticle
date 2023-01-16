@@ -1,14 +1,10 @@
 import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
 
 import { useEffect, useState } from 'react';
 
 import { useRecoilState } from 'recoil';
 
-import { getUserBookmarkedBooksApi, getUserKnottedBooksApi } from '@apis/bookApi';
 import { getUserProfileApi, updateUserProfileApi } from '@apis/userApi';
-import curBookmarkedBookListState from '@atoms/curBookmarkedBookList';
-import curKnottedBookListState from '@atoms/curKnottedBookList';
 import signInStatusState from '@atoms/signInStatus';
 import GNB from '@components/common/GNB';
 import BookListTab from '@components/study/BookListTab';
@@ -29,18 +25,9 @@ interface StudyProps {
 }
 
 export default function Study({ userProfile }: StudyProps) {
-  const router = useRouter();
-
   const { data: updatedUserProfile, execute: updateUserProfile } = useFetch(updateUserProfileApi);
-  const { data: knottedBookList, execute: getKnottedBookList } = useFetch(getUserKnottedBooksApi);
-  const { data: bookmarkedBookList, execute: getBookmarkedBookList } =
-    useFetch(getUserBookmarkedBooksApi);
 
   const [signInStatus, setSignInStatus] = useRecoilState(signInStatusState);
-  const [curKnottedBookList, setCurKnottedBookList] = useRecoilState(curKnottedBookListState);
-  const [curBookmarkedBookList, setCurBookmarkedBookList] = useRecoilState(
-    curBookmarkedBookListState
-  );
 
   const [curUserProfile, setCurUserProfile] = useState<IUser | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -50,14 +37,6 @@ export default function Study({ userProfile }: StudyProps) {
 
     updateUserProfile(curUserProfile);
   };
-
-  useEffect(() => {
-    if (!router.query.data) return;
-
-    const nickname = router.query.data;
-    getKnottedBookList(nickname);
-    getBookmarkedBookList(nickname);
-  }, [router.query.data]);
 
   useEffect(() => {
     if (!userProfile) return;
@@ -77,18 +56,6 @@ export default function Study({ userProfile }: StudyProps) {
     });
     window.history.replaceState(null, '', `/study/${curUserProfile.nickname}`);
   }, [updatedUserProfile]);
-
-  useEffect(() => {
-    if (!knottedBookList) return;
-
-    setCurKnottedBookList(knottedBookList);
-  }, [knottedBookList]);
-
-  useEffect(() => {
-    if (!bookmarkedBookList) return;
-
-    setCurBookmarkedBookList(bookmarkedBookList);
-  }, [bookmarkedBookList]);
 
   return (
     <>
@@ -115,11 +82,7 @@ export default function Study({ userProfile }: StudyProps) {
                 }}
               />
             )}
-            <BookListTab
-              knottedBookList={curKnottedBookList}
-              bookmarkedBookList={curBookmarkedBookList}
-              isUserMatched={signInStatus.id === curUserProfile.id}
-            />
+            <BookListTab isUserMatched={signInStatus.id === curUserProfile.id} />
           </PageInnerLarge>
         </PageWrapper>
       )}
