@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { createImageApi } from '@apis/imageApi';
 import Edit from '@assets/ico_edit.svg';
@@ -25,14 +25,12 @@ import {
 
 interface EditUserProfileProps {
   curUserProfile: IUser;
-  setCurUserProfile: (userProfile: IUser) => void;
-  handleEditFinishBtnClick: () => void;
+  updateUserProfile: (...args: any[]) => Promise<void>;
 }
 
 export default function EditUserProfile({
   curUserProfile,
-  setCurUserProfile,
-  handleEditFinishBtnClick,
+  updateUserProfile,
 }: EditUserProfileProps) {
   const { data: imgFile, execute: createImage } = useFetch(createImageApi);
 
@@ -40,6 +38,7 @@ export default function EditUserProfile({
   const { value: descriptionValue, onChange: onDescriptionChange } = useInput(
     curUserProfile.description
   );
+  const [profileImage, setProfileImage] = useState(curUserProfile.profile_image);
 
   const inputFile = useRef<HTMLInputElement | null>(null);
 
@@ -60,26 +59,26 @@ export default function EditUserProfile({
   };
 
   useEffect(() => {
-    setCurUserProfile({
+    if (!imgFile) return;
+
+    setProfileImage(imgFile.imagePath);
+  }, [imgFile]);
+
+  const handleEditFinishBtnClick = () => {
+    if (!curUserProfile) return;
+    const newUserProfile = {
       ...curUserProfile,
       nickname: nicknameValue,
       description: descriptionValue,
-    });
-  }, [nicknameValue, descriptionValue]);
-
-  useEffect(() => {
-    if (!imgFile) return;
-
-    setCurUserProfile({
-      ...curUserProfile,
-      profile_image: imgFile.imagePath,
-    });
-  }, [imgFile]);
+      profile_image: profileImage,
+    };
+    updateUserProfile(newUserProfile);
+  };
 
   return (
     <UserProfileWrapper>
       <UserThumbnailGroup>
-        <UserThumbnail src={curUserProfile.profile_image} alt="User1" width={200} height={200} />
+        <UserThumbnail src={profileImage} alt="User1" width={200} height={200} />
         <EditThumbnailIcon onClick={handleEditThumbnailClick}>
           <Image src={Edit} alt="profile_edit" width={20} />
           <input
@@ -94,13 +93,10 @@ export default function EditUserProfile({
 
       <UserDetailGroup>
         <UsernameGroup>
-          <EditUsername defaultValue={curUserProfile.nickname} onChange={onNicknameChange} />
+          <EditUsername value={nicknameValue} onChange={onNicknameChange} />
           {nicknameValue === '' && <RedNotice>빈 공백은 닉네임으로 설정할 수 없습니다</RedNotice>}
         </UsernameGroup>
-        <EditUserDescription
-          defaultValue={curUserProfile.description}
-          onChange={onDescriptionChange}
-        />
+        <EditUserDescription value={descriptionValue} onChange={onDescriptionChange} />
 
         <ButtonGroup isVisible>
           <ProfileEditButton

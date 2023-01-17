@@ -1,6 +1,11 @@
 import styled from 'styled-components';
 
-const BookGrid = styled.div`
+export const BookListTabWrapper = styled.div`
+  position: relative;
+  margin-top: 20px;
+`;
+
+export const BookGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   box-sizing: border-box;
@@ -20,5 +25,3 @@ const BookGrid = styled.div`
     grid-template-columns: repeat(1, 1fr);
   }
 `;
-
-export default BookGrid;

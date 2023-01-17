@@ -10,6 +10,12 @@ const nextConfig = {
         port: '',
         pathname: '/j027/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'kr.object.ncloudstorage.com',
+        port: '',
+        pathname: '/j179/**',
+      },
     ],
   },
 };
