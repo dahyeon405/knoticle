@@ -12,10 +12,8 @@ interface BookListTabProps {
 }
 
 export default function BookListTab({ knottedBookList, bookmarkedBookList }: BookListTabProps) {
-  // const [isEditing, setIsEditing] = useState<boolean>(false);
   const [tabStatus, setTabStatus] = useState<'knotted' | 'bookmarked'>('knotted');
 
-  // booklisttabwrapper 아래에 들어가야함  {isEditing && <EditModeIndicator>수정 모드</EditModeIndicator>}
   return (
     <BookListTabWrapper>
       <TabTitle tabStatus={tabStatus} setTabStatus={setTabStatus} />
