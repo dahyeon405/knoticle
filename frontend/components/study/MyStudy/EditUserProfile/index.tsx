@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { createImageApi } from '@apis/imageApi';
 import Edit from '@assets/ico_edit.svg';
@@ -25,13 +25,11 @@ import {
 
 interface EditUserProfileProps {
   curUserProfile: IUser;
-  setCurUserProfile: (userProfile: IUser) => void;
-  updateUserProfile: any;
+  updateUserProfile: (...args: any[]) => Promise<void>;
 }
 
 export default function EditUserProfile({
   curUserProfile,
-  setCurUserProfile,
   updateUserProfile,
 }: EditUserProfileProps) {
   const { data: imgFile, execute: createImage } = useFetch(createImageApi);
@@ -40,6 +38,7 @@ export default function EditUserProfile({
   const { value: descriptionValue, onChange: onDescriptionChange } = useInput(
     curUserProfile.description
   );
+  const [profileImage, setProfileImage] = useState(curUserProfile.profile_image);
 
   const inputFile = useRef<HTMLInputElement | null>(null);
 
@@ -62,10 +61,7 @@ export default function EditUserProfile({
   useEffect(() => {
     if (!imgFile) return;
 
-    setCurUserProfile({
-      ...curUserProfile,
-      profile_image: imgFile.imagePath,
-    });
+    setProfileImage(imgFile.imagePath);
   }, [imgFile]);
 
   const handleEditFinishBtnClick = () => {
@@ -74,15 +70,15 @@ export default function EditUserProfile({
       ...curUserProfile,
       nickname: nicknameValue,
       description: descriptionValue,
+      profile_image: profileImage,
     };
     updateUserProfile(newUserProfile);
-    setCurUserProfile(newUserProfile);
   };
 
   return (
     <UserProfileWrapper>
       <UserThumbnailGroup>
-        <UserThumbnail src={curUserProfile.profile_image} alt="User1" width={200} height={200} />
+        <UserThumbnail src={profileImage} alt="User1" width={200} height={200} />
         <EditThumbnailIcon onClick={handleEditThumbnailClick}>
           <Image src={Edit} alt="profile_edit" width={20} />
           <input
