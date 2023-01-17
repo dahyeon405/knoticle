@@ -2,16 +2,14 @@ import { GetServerSideProps } from 'next';
 
 import { useEffect, useState } from 'react';
 
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 
-import { getUserProfileApi, updateUserProfileApi } from '@apis/userApi';
+import { getUserProfileApi } from '@apis/userApi';
 import signInStatusState from '@atoms/signInStatus';
 import GNB from '@components/common/GNB';
-import BookListTab from '@components/study/BookListTab';
-import EditUserProfile from '@components/study/EditUserProfile';
+import MyStudy from '@components/study/MyStudy';
+import OtherStudy from '@components/study/OtherStudy';
 import StudyHead from '@components/study/StudyHead';
-import UserProfile from '@components/study/UserProfile';
-import useFetch from '@hooks/useFetch';
 import { IUser } from '@interfaces';
 import { PageInnerLarge, PageWrapper } from '@styles/layout';
 
@@ -25,37 +23,12 @@ interface StudyProps {
 }
 
 export default function Study({ userProfile }: StudyProps) {
-  const { data: updatedUserProfile, execute: updateUserProfile } = useFetch(updateUserProfileApi);
-
-  const [signInStatus, setSignInStatus] = useRecoilState(signInStatusState);
-
-  const [curUserProfile, setCurUserProfile] = useState<IUser | null>(null);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-
-  const handleEditFinishBtnClick = () => {
-    if (!curUserProfile) return;
-
-    updateUserProfile(curUserProfile);
-  };
+  const signInStatus = useRecoilValue(signInStatusState);
+  const [curUserProfile, setCurUserProfile] = useState<IUser>(userProfile);
 
   useEffect(() => {
-    if (!userProfile) return;
-
-    setCurUserProfile({
-      ...userProfile,
-    });
+    setCurUserProfile(userProfile);
   }, [userProfile]);
-
-  useEffect(() => {
-    if (updatedUserProfile === undefined || !curUserProfile) return;
-
-    setIsEditing(false);
-    setSignInStatus({
-      ...signInStatus,
-      nickname: curUserProfile.nickname,
-    });
-    window.history.replaceState(null, '', `/study/${curUserProfile.nickname}`);
-  }, [updatedUserProfile]);
 
   return (
     <>
@@ -65,24 +38,14 @@ export default function Study({ userProfile }: StudyProps) {
         userImage={userProfile.profile_image}
       />
       <GNB />
-      {curUserProfile && (
+      {userProfile && (
         <PageWrapper>
           <PageInnerLarge>
-            {isEditing ? (
-              <EditUserProfile
-                handleEditFinishBtnClick={handleEditFinishBtnClick}
-                curUserProfile={curUserProfile}
-                setCurUserProfile={setCurUserProfile}
-              />
+            {signInStatus.nickname === curUserProfile.nickname ? (
+              <MyStudy curUserProfile={curUserProfile} setCurUserProfile={setCurUserProfile} />
             ) : (
-              <UserProfile
-                curUserProfile={curUserProfile}
-                handleEditBtnClick={() => {
-                  setIsEditing(true);
-                }}
-              />
+              <OtherStudy curUserProfile={userProfile} />
             )}
-            <BookListTab isUserMatched={signInStatus.id === curUserProfile.id} />
           </PageInnerLarge>
         </PageWrapper>
       )}
