@@ -1,19 +1,25 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 
 import { getOrderedBookListApi } from '@apis/bookApi';
 import Footer from '@components/common/Footer';
 import GNB from '@components/common/GNB';
 import HomeHead from '@components/home/HomeHead';
 import Slider from '@components/home/Slider';
-import useFetch from '@hooks/useFetch';
 import { PageInnerLarge, PageWrapper } from '@styles/layout';
 
 export default function Home() {
-  const {
-    data: newestBookList,
-    isLoading: isNewBookListLoading,
-    execute: getNewestBookList,
-  } = useFetch(getOrderedBookListApi);
+  const { data: newestBookList, isLoading: isNewBookListLoading } = useQuery(
+    'orderedBookList',
+    () => getOrderedBookListApi('newest'),
+    { staleTime: 20000 }
+  );
+
+  const { data: popularBookList, isLoading: isPopularBookListLoading } = useQuery(
+    'popularBookList',
+    () => getOrderedBookListApi('bookmark'),
+    { staleTime: 20000 }
+  );
 
   const [numberPerPage, setNumberPerPage] = useState(0);
 
@@ -41,17 +47,6 @@ export default function Home() {
     return () => {
       window.removeEventListener('resize', resizingHandler);
     };
-  }, []);
-
-  const {
-    data: popularBookList,
-    isLoading: isPopularBookListLoading,
-    execute: getPopularBookList,
-  } = useFetch(getOrderedBookListApi);
-
-  useEffect(() => {
-    getNewestBookList('newest');
-    getPopularBookList('bookmark');
   }, []);
 
   return (
