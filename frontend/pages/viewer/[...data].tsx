@@ -11,22 +11,20 @@ import ScrollAppearer from '@components/common/ScrollAppearer';
 import ArticleContainer from '@components/viewer/ArticleContent';
 import TOC from '@components/viewer/TOC';
 import ViewerHead from '@components/viewer/ViewerHead';
-import useFetch from '@hooks/useFetch';
 import { IArticleBook, IBookScraps } from '@interfaces';
 import { Flex, PageGNBHide, PageNoScrollWrapper } from '@styles/layout';
 import { parseHeadings } from '@utils/toc';
 
 interface ViewerProps {
   article: IArticleBook;
+  book: IBookScraps;
 }
 
-export default function Viewer({ article }: ViewerProps) {
+export default function Viewer({ article, book }: ViewerProps) {
   const Modal = dynamic(() => import('@components/common/Modal'));
   const ScrapModal = dynamic(() => import('@components/viewer/ScrapModal'));
 
   const router = useRouter();
-
-  const { data: book, execute: getBook } = useFetch<IBookScraps>(getBookApi);
 
   const [isSideBarOpen, setSideBarOpen] = useState(false);
   const [isModalShown, setModalShown] = useState(false);
@@ -57,13 +55,6 @@ export default function Viewer({ article }: ViewerProps) {
 
     return () => window.removeEventListener('resize', syncHeight);
   }, []);
-
-  useEffect(() => {
-    if (Array.isArray(router.query.data) && router.query.data?.length === 2) {
-      const bookId = router.query.data[0];
-      getBook(bookId);
-    }
-  }, [router.query.data]);
 
   useEffect(() => {
     if (book === undefined) return;
@@ -113,9 +104,12 @@ export default function Viewer({ article }: ViewerProps) {
   );
 }
 
+/* eslint-disable camelcase */
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const [, articleId] = context.query.data as string[];
+  const [bookId, articleId] = context.query.data as string[];
+  const { cookies } = context.req;
   const article = await getArticleApi(articleId);
+  const book = await getBookApi(bookId, cookies.access_token);
 
-  return { props: { article } };
+  return { props: { article, book } };
 };
