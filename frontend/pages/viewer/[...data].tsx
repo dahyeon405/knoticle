@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import { getArticleApi } from '@apis/articleApi';
 import { getBookApi } from '@apis/bookApi';
 import GNB from '@components/common/GNB';
-import ScrollAppearer from '@components/common/ScrollAppearer';
 import ArticleContainer from '@components/viewer/ArticleContent';
 import TOC from '@components/viewer/TOC';
 import ViewerHead from '@components/viewer/ViewerHead';
@@ -66,10 +65,8 @@ export default function Viewer({ article, book }: ViewerProps) {
   return (
     <PageNoScrollWrapper>
       {article && <ViewerHead articleTitle={article.title} articleContent={article.content} />}
-      <PageGNBHide>
-        <ScrollAppearer height="67px" isScrollDown={isScrollDown === 'true'}>
-          <GNB />
-        </ScrollAppearer>
+      <PageGNBHide isscrolldown={isScrollDown}>
+        <GNB />
       </PageGNBHide>
       {book && article && (
         <Flex>
