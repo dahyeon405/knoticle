@@ -52,10 +52,20 @@ export const getOrderedBookListApi = async (order: string) => {
   return response.data;
 };
 
-export const getBookApi = async (bookId: string) => {
+/* eslint-disable camelcase */
+export const getBookApi = async (bookId: string, access_token?: string) => {
   const url = `/api/books/${bookId}`;
 
-  const response = await api({ url, method: 'GET' });
+  let response;
+  if (!access_token) response = await api({ url, method: 'GET' });
+  else
+    response = await api({
+      url,
+      method: 'GET',
+      header: {
+        Cookie: `access_token=${access_token};`,
+      },
+    });
 
   return response.data;
 };
