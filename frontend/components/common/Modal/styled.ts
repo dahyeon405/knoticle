@@ -7,6 +7,7 @@ export const Dimmed = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.3);
+  z-index: 98;
 `;
 
 export const ModalWrapper = styled.div`
@@ -14,7 +15,7 @@ export const ModalWrapper = styled.div`
   top: 0px;
   left: 0px;
   width: 100%;
-  height: 100%;
+  height: var(--window-inner-height);
   display: flex;
   justify-content: center;
   align-items: center;

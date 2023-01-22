@@ -7,26 +7,23 @@ import { useEffect, useState } from 'react';
 import { getArticleApi } from '@apis/articleApi';
 import { getBookApi } from '@apis/bookApi';
 import GNB from '@components/common/GNB';
-import ScrollAppearer from '@components/common/ScrollAppearer';
 import ArticleContainer from '@components/viewer/ArticleContent';
 import TOC from '@components/viewer/TOC';
 import ViewerHead from '@components/viewer/ViewerHead';
-import useFetch from '@hooks/useFetch';
 import { IArticleBook, IBookScraps } from '@interfaces';
 import { Flex, PageGNBHide, PageNoScrollWrapper } from '@styles/layout';
 import { parseHeadings } from '@utils/toc';
 
 interface ViewerProps {
   article: IArticleBook;
+  book: IBookScraps;
 }
 
-export default function Viewer({ article }: ViewerProps) {
+export default function Viewer({ article, book }: ViewerProps) {
   const Modal = dynamic(() => import('@components/common/Modal'));
   const ScrapModal = dynamic(() => import('@components/viewer/ScrapModal'));
 
   const router = useRouter();
-
-  const { data: book, execute: getBook } = useFetch<IBookScraps>(getBookApi);
 
   const [isSideBarOpen, setSideBarOpen] = useState(false);
   const [isModalShown, setModalShown] = useState(false);
@@ -59,13 +56,6 @@ export default function Viewer({ article }: ViewerProps) {
   }, []);
 
   useEffect(() => {
-    if (Array.isArray(router.query.data) && router.query.data?.length === 2) {
-      const bookId = router.query.data[0];
-      getBook(bookId);
-    }
-  }, [router.query.data]);
-
-  useEffect(() => {
     if (book === undefined) return;
     if (!checkArticleAuthority(book, article.id)) router.push('/404');
   }, [book]);
@@ -75,10 +65,8 @@ export default function Viewer({ article }: ViewerProps) {
   return (
     <PageNoScrollWrapper>
       {article && <ViewerHead articleTitle={article.title} articleContent={article.content} />}
-      <PageGNBHide>
-        <ScrollAppearer height="67px" isScrollDown={isScrollDown === 'true'}>
-          <GNB />
-        </ScrollAppearer>
+      <PageGNBHide isscrolldown={isScrollDown}>
+        <GNB />
       </PageGNBHide>
       {book && article && (
         <Flex>
@@ -113,9 +101,12 @@ export default function Viewer({ article }: ViewerProps) {
   );
 }
 
+/* eslint-disable camelcase */
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const [, articleId] = context.query.data as string[];
+  const [bookId, articleId] = context.query.data as string[];
+  const { cookies } = context.req;
   const article = await getArticleApi(articleId);
+  const book = await getBookApi(bookId, cookies.access_token);
 
-  return { props: { article } };
+  return { props: { article, book } };
 };
